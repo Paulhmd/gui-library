@@ -1,0 +1,45 @@
+import java.sql.*;
+
+public class UserDAO {
+
+    // Method to check if a username exists
+    public static boolean usernameExists(String username) {
+        Connection conn = DatabaseConnection.connect();
+        if (conn != null) {
+            try {
+                String query = "SELECT 1 FROM Users WHERE username = ?";
+                PreparedStatement stmt = conn.prepareStatement(query);
+                stmt.setString(1, username);
+                ResultSet rs = stmt.executeQuery();
+                return rs.next(); // If a result is found, the username exists
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    // Method to insert a new user into the database
+    public static boolean registerUser(String firstName, String lastName, String contact, String email, String username, String password) {
+        Connection conn = DatabaseConnection.connect();
+        if (conn != null) {
+            try {
+                String query = "INSERT INTO Users (first_name, last_name, contact, email, username, password) VALUES (?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmt = conn.prepareStatement(query);
+                stmt.setString(1, firstName);
+                stmt.setString(2, lastName);
+                stmt.setString(3, contact);
+                stmt.setString(4, email);
+                stmt.setString(5, username);
+                stmt.setString(6, password); // Hash the password in a real-world application
+                int rowsAffected = stmt.executeUpdate();
+                return rowsAffected > 0; // If more than 0 rows are affected, the user is registered
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+}
